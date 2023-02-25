@@ -8,23 +8,23 @@ import { Loader } from './Loader/Loader';
 import { getImagesFromPixabay } from './GetImagesApi';
 
 export function App() {
-  const [query, setQuery] = useState(null);
+  const [query, setQuery] = useState('fantasy');
   const [page, setPage] = useState(1);
   const [imgArr, setImgArr] = useState([]);
   const [totalHits, setTotalHits] = useState(null);
   const [error, setErorr] = useState(null);
-  const [status, setStatus] = useState('idle');
+  const [isPending, setIsPending] = useState(false);
 
   useEffect(()=> {
-    setStatus("pending");
+    setIsPending(true);
 
     getImagesFromPixabay(query, page)
       .then(images => {
         setImgArr(prevState => [...prevState, ...images.hits])
         setTotalHits(images.totalHits) 
-        setStatus("pending")})
+        setIsPending(false)})
       .catch(err => {
-        setStatus("pending") 
+        setIsPending(false) 
         setErorr(err)})
 
   }, [query, page])
@@ -36,19 +36,15 @@ export function App() {
     }
 
   const onloadMoreClick = () => setPage(prevPage => prevPage + 1);
-
-  const isPending = status === "pending";
-  const isResolved = status === "resolved";
-  const isError = status === "rejected";
   const isBtnShown =  Boolean(imgArr.length) && !(totalHits <= page * 12);
 
   return (
     <Container>
       <Searchbar handleInputValue={handleInputValue}/>
       {isPending && <Loader/>}
-      {isResolved && <ImageGallery images={imgArr}/>}        
+      {!isPending && <ImageGallery images={imgArr}/>}        
       {isBtnShown && <Button loadMore={onloadMoreClick}/>}
-      {isError && Notify.failure(error.message)}
+      {error && Notify.failure(error.message)}
     </Container>
   )
 };
