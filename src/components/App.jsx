@@ -32,7 +32,7 @@ export function App() {
   const handleInputValue = (inputValue) => {
     setQuery(inputValue)
     setPage(1)
-    imgArr([])
+    setImgArr([])
     }
 
   const onloadMoreClick = () => setPage(prevPage => prevPage + 1);
